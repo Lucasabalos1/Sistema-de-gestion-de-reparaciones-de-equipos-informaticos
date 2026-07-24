@@ -10,9 +10,8 @@ def create_app(config_class=Config):
     cors.init_app(app)
     jwt.init_app(app)
 
-    # 2. Acá registraremos los Blueprints más adelante
-    # from app.routes.auth import auth_bp
-    # app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    from app.routes.auth import auth_bp
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
 
     # Ruta de prueba base
     @app.route('/')

@@ -1,0 +1,58 @@
+import pytest
+from datetime import timedelta
+from app import create_app
+from app.extensions import db as _db
+from app.models import Administrador
+
+
+class TestConfig:
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = 'test_secret_key'
+    JWT_SECRET_KEY = 'test_jwt_secret_key'
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
+
+
+@pytest.fixture(scope='session')
+def app():
+    application = create_app(config_class=TestConfig)
+    with application.app_context():
+        _db.create_all()
+        yield application
+        _db.drop_all()
+
+
+@pytest.fixture(autouse=True)
+def setup_db(app):
+    with app.app_context():
+        _db.session.rollback()
+        from sqlalchemy import text
+        _db.session.execute(text("DELETE FROM administrador"))
+        _db.session.commit()
+        yield
+        _db.session.rollback()
+
+
+@pytest.fixture()
+def client(app):
+    return app.test_client()
+
+
+@pytest.fixture()
+def db(app):
+    return _db
+
+
+def create_test_admin(db):
+    from werkzeug.security import generate_password_hash
+    admin = Administrador(
+        usuario='admin_test',
+        contraseña=generate_password_hash('password123'),
+        nombre='Juan',
+        apellido='Perez',
+        genero='Masculino'
+    )
+    db.session.add(admin)
+    db.session.commit()
+    return admin

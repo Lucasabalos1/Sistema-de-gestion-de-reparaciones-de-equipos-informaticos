@@ -10,7 +10,7 @@ with app.app_context():
     if models.Administrador.query.count() == 0:
         from werkzeug.security import generate_password_hash
         admin = models.Administrador(
-            usuario='Lukacha 531',
+            usuario='Lukacha531',
             contraseña=generate_password_hash('adminabalos1357'),
             nombre='Lucas',
             apellido='Abalos',
