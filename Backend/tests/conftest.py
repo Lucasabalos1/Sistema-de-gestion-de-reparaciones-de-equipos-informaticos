@@ -29,6 +29,7 @@ def setup_db(app):
         _db.session.rollback()
         from sqlalchemy import text
         _db.session.execute(text("DELETE FROM administrador"))
+        _db.session.execute(text("DELETE FROM consulta_telegram"))
         _db.session.commit()
         yield
         _db.session.rollback()
@@ -56,3 +57,10 @@ def create_test_admin(db):
     db.session.add(admin)
     db.session.commit()
     return admin
+
+
+def get_auth_headers(client, db):
+    from flask_jwt_extended import create_access_token
+    admin = create_test_admin(db)
+    token = create_access_token(identity=str(admin.admin_id))
+    return {'Authorization': f'Bearer {token}'}
