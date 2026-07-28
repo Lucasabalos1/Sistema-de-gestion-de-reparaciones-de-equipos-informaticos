@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+body {
+  background-color: #040508;
+}
+
 @theme {
   --color-text: #e3e5ec;
   --color-text-muted: #6b7280;
