@@ -11,3 +11,5 @@ class Config:
 
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'default_jwt_key_para_pruebas_locales')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
+
+    NOTIFICATION_API_KEY = os.environ.get('NOTIFICATION_API_KEY', 'n8n_bytemend_test_key_2026')

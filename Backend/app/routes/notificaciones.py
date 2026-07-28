@@ -1,11 +1,23 @@
 from datetime import date, timedelta
+from functools import wraps
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 from app.extensions import db
+from app.config import Config
 from app.models import Consulta_Telegram
 
 notificaciones_bp = Blueprint('notificaciones', __name__)
+
+
+def require_api_key(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        api_key = request.headers.get('X-API-Key')
+        if not api_key or api_key != Config.NOTIFICATION_API_KEY:
+            return jsonify({'error': 'API key inválida o no proporcionada.'}), 401
+        return f(*args, **kwargs)
+    return decorated
 
 
 def mapear_notificacion(n):
@@ -22,6 +34,7 @@ def mapear_notificacion(n):
     }
 
 @notificaciones_bp.route('/cargar', methods=['POST'])
+@require_api_key
 def cargar_notificacion():
     data = request.get_json()
 
