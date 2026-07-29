@@ -16,6 +16,12 @@ def create_app(config_class=Config):
     from app.routes.notificaciones import notificaciones_bp
     app.register_blueprint(notificaciones_bp, url_prefix='/api/notificaciones')
 
+    from app.routes.clientes import clientes_bp
+    app.register_blueprint(clientes_bp, url_prefix='/api/clientes')
+
+    from app.routes.servicios import servicios_bp
+    app.register_blueprint(servicios_bp, url_prefix='/api/servicios')
+
     # Ruta de prueba base
     @app.route('/')
     def index():

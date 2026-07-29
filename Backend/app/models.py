@@ -62,6 +62,7 @@ class Servicio(db.Model):
     servicio_id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(32), nullable=False)
     precio = db.Column(db.Integer, nullable=False)
+    estado = db.Column(db.Boolean, nullable=False, default=True)
 
     detalles = db.relationship('Turno_Detalle', backref='servicio', lazy=True)
 
