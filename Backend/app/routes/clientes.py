@@ -126,3 +126,29 @@ def eliminarCliente(id_cliente):
         db.session.rollback()
         return jsonify({'error': 'Error interno del servidor al eliminar el cliente.', 'detalle': str(e)}), 500
 
+
+@clientes_bp.route('/<string:telefono_cliente>', methods=['GET'])
+@jwt_required()
+def obtenerCliente(telefono_cliente):
+    try:
+        if not telefono_cliente or telefono_cliente.strip() == '':
+            return jsonify({'error': 'El teléfono del cliente no puede estar vacío.'}), 400
+
+        cliente = Cliente.query.filter_by(telefono=telefono_cliente).first()
+
+        if not cliente:
+            return jsonify({'message': 'No se encontró un cliente con ese teléfono.'}), 404
+
+        return jsonify({
+            'cliente_id': cliente.cliente_id,
+            'admin_id': cliente.admin_id,
+            'nombre': cliente.nombre,
+            'apellido': cliente.apellido if cliente.apellido else "No hay datos por el momento",
+            'telefono': cliente.telefono,
+            'correo': cliente.correo if cliente.correo else "No hay datos por el momento",
+            'genero': cliente.genero if cliente.genero else "No hay datos por el momento"
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': 'Error interno del servidor al buscar el cliente.', 'detalle': str(e)}), 500
+

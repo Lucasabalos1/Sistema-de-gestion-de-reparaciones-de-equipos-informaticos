@@ -26,6 +26,8 @@ def crear_notificacion_db(db, **kwargs):
     return notificacion
 
 
+api_key_headers = {'X-API-Key': 'n8n_bytemend_test_key_2026'}
+
 payload_completo = {
     'card_backend': {
         'chat_id_telegram': 123456789,
@@ -46,6 +48,7 @@ payload_completo = {
 def test_cargar_notificacion_exitosa(client):
     response = client.post('/api/notificaciones/cargar',
                            json=payload_completo,
+                           headers=api_key_headers,
                            content_type='application/json')
     data = json.loads(response.data)
     assert response.status_code == 201
@@ -61,6 +64,7 @@ def test_cargar_notificacion_resumen_ia_vacio(client):
     }
     response = client.post('/api/notificaciones/cargar',
                            json=payload,
+                           headers=api_key_headers,
                            content_type='application/json')
     assert response.status_code == 201
 
@@ -74,6 +78,7 @@ def test_cargar_notificacion_resumen_ia_nulo(client):
     }
     response = client.post('/api/notificaciones/cargar',
                            json=payload,
+                           headers=api_key_headers,
                            content_type='application/json')
     assert response.status_code == 201
 
@@ -81,6 +86,7 @@ def test_cargar_notificacion_resumen_ia_nulo(client):
 def test_cargar_falta_card_backend(client):
     response = client.post('/api/notificaciones/cargar',
                            json={},
+                           headers=api_key_headers,
                            content_type='application/json')
     data = json.loads(response.data)
     assert response.status_code == 400
@@ -96,6 +102,7 @@ def test_cargar_campo_obligatorio_vacio(client):
     }
     response = client.post('/api/notificaciones/cargar',
                            json=payload,
+                           headers=api_key_headers,
                            content_type='application/json')
     data = json.loads(response.data)
     assert response.status_code == 400
@@ -111,6 +118,7 @@ def test_cargar_campo_obligatorio_ausente(client):
     }
     response = client.post('/api/notificaciones/cargar',
                            json=payload,
+                           headers=api_key_headers,
                            content_type='application/json')
     data = json.loads(response.data)
     assert response.status_code == 400
@@ -118,6 +126,7 @@ def test_cargar_campo_obligatorio_ausente(client):
 
 def test_cargar_sin_body(client):
     response = client.post('/api/notificaciones/cargar',
+                           headers=api_key_headers,
                            content_type='application/json')
     assert response.status_code == 400
 

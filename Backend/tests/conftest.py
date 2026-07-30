@@ -28,6 +28,10 @@ def setup_db(app):
     with app.app_context():
         _db.session.rollback()
         from sqlalchemy import text
+        _db.session.execute(text("DELETE FROM turno_detalle"))
+        _db.session.execute(text("DELETE FROM turno"))
+        _db.session.execute(text("DELETE FROM servicio"))
+        _db.session.execute(text("DELETE FROM cliente"))
         _db.session.execute(text("DELETE FROM administrador"))
         _db.session.execute(text("DELETE FROM consulta_telegram"))
         _db.session.commit()

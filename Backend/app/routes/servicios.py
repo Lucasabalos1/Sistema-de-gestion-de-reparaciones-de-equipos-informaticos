@@ -86,3 +86,32 @@ def editarServicio(id_servicio):
         db.session.rollback()
         return jsonify({'error': 'Error interno del servidor al editar el servicio.', 'detalle': str(e)}), 500
 
+
+@servicios_bp.route('/<string:nombre_servicio>', methods=['GET'])
+@jwt_required()
+def obtenerServicio(nombre_servicio):
+    try:
+        if not nombre_servicio or nombre_servicio.strip() == '':
+            return jsonify({'error': 'El nombre del servicio no puede estar vacío.'}), 400
+
+        servicios = Servicio.query.filter(
+            Servicio.nombre.like(f'%{nombre_servicio}%')
+        ).all()
+
+        if not servicios:
+            return jsonify({'message': 'No se encontraron servicios con ese nombre.'}), 404
+
+        resultado = []
+        for s in servicios:
+            resultado.append({
+                'servicio_id': s.servicio_id,
+                'nombre': s.nombre,
+                'precio': s.precio,
+                'estado': s.estado
+            })
+
+        return jsonify(resultado), 200
+
+    except Exception as e:
+        return jsonify({'error': 'Error interno del servidor al buscar el servicio.', 'detalle': str(e)}), 500
+
