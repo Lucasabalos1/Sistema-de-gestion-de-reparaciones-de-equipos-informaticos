@@ -21,7 +21,7 @@ def obtenerClientes():
                 'cliente_id': c.cliente_id,
                 'admin_id': c.admin_id,
                 'nombre': c.nombre,
-                'apellido': c.apellido if c.apellido else "No hay datos por el momento",
+                'apellido': c.apellido if c.apellido else "",
                 'telefono': c.telefono,
                 'correo': c.correo if c.correo else "No hay datos por el momento",
                 'genero': c.genero if c.genero else "No hay datos por el momento"
@@ -143,7 +143,7 @@ def obtenerCliente(telefono_cliente):
             'cliente_id': cliente.cliente_id,
             'admin_id': cliente.admin_id,
             'nombre': cliente.nombre,
-            'apellido': cliente.apellido if cliente.apellido else "No hay datos por el momento",
+            'apellido': cliente.apellido if cliente.apellido else "",
             'telefono': cliente.telefono,
             'correo': cliente.correo if cliente.correo else "No hay datos por el momento",
             'genero': cliente.genero if cliente.genero else "No hay datos por el momento"

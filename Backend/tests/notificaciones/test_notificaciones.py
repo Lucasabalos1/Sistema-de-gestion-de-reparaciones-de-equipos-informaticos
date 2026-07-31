@@ -42,11 +42,11 @@ payload_completo = {
 
 
 # ──────────────────────────────────────────────
-# Tests: POST /api/notificaciones/cargar
+# Tests: POST /api/notificaciones/
 # ──────────────────────────────────────────────
 
 def test_cargar_notificacion_exitosa(client):
-    response = client.post('/api/notificaciones/cargar',
+    response = client.post('/api/notificaciones/',
                            json=payload_completo,
                            headers=api_key_headers,
                            content_type='application/json')
@@ -62,7 +62,7 @@ def test_cargar_notificacion_resumen_ia_vacio(client):
             'resumen_ia': '',
         }
     }
-    response = client.post('/api/notificaciones/cargar',
+    response = client.post('/api/notificaciones/',
                            json=payload,
                            headers=api_key_headers,
                            content_type='application/json')
@@ -76,7 +76,7 @@ def test_cargar_notificacion_resumen_ia_nulo(client):
             'resumen_ia': None,
         }
     }
-    response = client.post('/api/notificaciones/cargar',
+    response = client.post('/api/notificaciones/',
                            json=payload,
                            headers=api_key_headers,
                            content_type='application/json')
@@ -84,7 +84,7 @@ def test_cargar_notificacion_resumen_ia_nulo(client):
 
 
 def test_cargar_falta_card_backend(client):
-    response = client.post('/api/notificaciones/cargar',
+    response = client.post('/api/notificaciones/',
                            json={},
                            headers=api_key_headers,
                            content_type='application/json')
@@ -100,7 +100,7 @@ def test_cargar_campo_obligatorio_vacio(client):
             'telefono': '',
         }
     }
-    response = client.post('/api/notificaciones/cargar',
+    response = client.post('/api/notificaciones/',
                            json=payload,
                            headers=api_key_headers,
                            content_type='application/json')
@@ -116,7 +116,7 @@ def test_cargar_campo_obligatorio_ausente(client):
             'nombre_telegram': 'Juan Perez',
         }
     }
-    response = client.post('/api/notificaciones/cargar',
+    response = client.post('/api/notificaciones/',
                            json=payload,
                            headers=api_key_headers,
                            content_type='application/json')
@@ -125,24 +125,24 @@ def test_cargar_campo_obligatorio_ausente(client):
 
 
 def test_cargar_sin_body(client):
-    response = client.post('/api/notificaciones/cargar',
+    response = client.post('/api/notificaciones/',
                            headers=api_key_headers,
                            content_type='application/json')
     assert response.status_code == 400
 
 
 # ──────────────────────────────────────────────
-# Tests: GET /api/notificaciones/mostrar
+# Tests: GET /api/notificaciones/
 # ──────────────────────────────────────────────
 
 def test_mostrar_sin_token(client):
-    response = client.get('/api/notificaciones/mostrar')
+    response = client.get('/api/notificaciones/')
     assert response.status_code == 401
 
 
 def test_mostrar_listas_vacias(client, db):
     headers = get_auth_headers(client, db)
-    response = client.get('/api/notificaciones/mostrar', headers=headers)
+    response = client.get('/api/notificaciones/', headers=headers)
     data = json.loads(response.data)
     assert response.status_code == 200
     assert data['leidas'] == []
@@ -153,7 +153,7 @@ def test_mostrar_no_leidas_aparecen(client, db):
     headers = get_auth_headers(client, db)
     crear_notificacion_db(db, leido=False)
 
-    response = client.get('/api/notificaciones/mostrar', headers=headers)
+    response = client.get('/api/notificaciones/', headers=headers)
     data = json.loads(response.data)
     assert response.status_code == 200
     assert len(data['no_leidas']) == 1
@@ -164,7 +164,7 @@ def test_mostrar_leidas_dentro_de_14_dias(client, db):
     headers = get_auth_headers(client, db)
     crear_notificacion_db(db, leido=True, fecha_recepcion=date.today())
 
-    response = client.get('/api/notificaciones/mostrar', headers=headers)
+    response = client.get('/api/notificaciones/', headers=headers)
     data = json.loads(response.data)
     assert response.status_code == 200
     assert len(data['leidas']) == 1
@@ -174,7 +174,7 @@ def test_mostrar_leidas_fuera_de_14_dias_no_aparecen(client, db):
     headers = get_auth_headers(client, db)
     crear_notificacion_db(db, leido=True, fecha_recepcion=date.today() - timedelta(days=20))
 
-    response = client.get('/api/notificaciones/mostrar', headers=headers)
+    response = client.get('/api/notificaciones/', headers=headers)
     data = json.loads(response.data)
     assert response.status_code == 200
     assert len(data['leidas']) == 0
@@ -184,7 +184,7 @@ def test_mostrar_resumen_ia_vacio_muestra_texto_default(client, db):
     headers = get_auth_headers(client, db)
     crear_notificacion_db(db, resumen_ia='')
 
-    response = client.get('/api/notificaciones/mostrar', headers=headers)
+    response = client.get('/api/notificaciones/', headers=headers)
     data = json.loads(response.data)
     assert response.status_code == 200
     assert data['no_leidas'][0]['resumen_ia'] == 'este mensaje no paso por el agente de IA'
@@ -194,7 +194,7 @@ def test_mostrar_resumen_ia_nulo_muestra_texto_default(client, db):
     headers = get_auth_headers(client, db)
     crear_notificacion_db(db, resumen_ia=None)
 
-    response = client.get('/api/notificaciones/mostrar', headers=headers)
+    response = client.get('/api/notificaciones/', headers=headers)
     data = json.loads(response.data)
     assert response.status_code == 200
     assert data['no_leidas'][0]['resumen_ia'] == 'este mensaje no paso por el agente de IA'
@@ -204,18 +204,18 @@ def test_mostrar_resumen_ia_con_datos(client, db):
     headers = get_auth_headers(client, db)
     crear_notificacion_db(db, resumen_ia='Reparación de pantalla LCD')
 
-    response = client.get('/api/notificaciones/mostrar', headers=headers)
+    response = client.get('/api/notificaciones/', headers=headers)
     data = json.loads(response.data)
     assert response.status_code == 200
     assert data['no_leidas'][0]['resumen_ia'] == 'Reparación de pantalla LCD'
 
 
 # ──────────────────────────────────────────────
-# Tests: PUT /api/notificaciones/leida/<id>
+# Tests: PATCH /api/notificaciones/<id>
 # ──────────────────────────────────────────────
 
 def test_leida_sin_token(client):
-    response = client.put('/api/notificaciones/leida/1')
+    response = client.patch('/api/notificaciones/1')
     assert response.status_code == 401
 
 
@@ -223,8 +223,8 @@ def test_leida_exitoso(client, db):
     headers = get_auth_headers(client, db)
     notificacion = crear_notificacion_db(db, leido=False)
 
-    response = client.put(f'/api/notificaciones/leida/{notificacion.consulta_id}',
-                          headers=headers)
+    response = client.patch(f'/api/notificaciones/{notificacion.consulta_id}',
+                            headers=headers)
     data = json.loads(response.data)
     assert response.status_code == 200
     assert data['mensaje'] == 'Notificación marcada como leída.'
@@ -235,7 +235,7 @@ def test_leida_exitoso(client, db):
 
 def test_leida_no_encontrada(client, db):
     headers = get_auth_headers(client, db)
-    response = client.put('/api/notificaciones/leida/999999', headers=headers)
+    response = client.patch('/api/notificaciones/999999', headers=headers)
     data = json.loads(response.data)
     assert response.status_code == 404
     assert 'no encontrada' in data['error']

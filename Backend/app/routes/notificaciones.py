@@ -1,10 +1,9 @@
 from datetime import date, timedelta
 from functools import wraps
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required
 from app.extensions import db
-from app.config import Config
 from app.models import Consulta_Telegram
 
 notificaciones_bp = Blueprint('notificaciones', __name__)
@@ -14,7 +13,7 @@ def require_api_key(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         api_key = request.headers.get('X-API-Key')
-        if not api_key or api_key != Config.NOTIFICATION_API_KEY:
+        if not api_key or api_key != current_app.config['NOTIFICATION_API_KEY']:
             return jsonify({'error': 'API key inválida o no proporcionada.'}), 401
         return f(*args, **kwargs)
     return decorated
@@ -33,7 +32,7 @@ def mapear_notificacion(n):
         'leido': n.leido
     }
 
-@notificaciones_bp.route('/cargar', methods=['POST'])
+@notificaciones_bp.route('/', methods=['POST'])
 @require_api_key
 def cargar_notificacion():
     data = request.get_json()
@@ -67,7 +66,7 @@ def cargar_notificacion():
     return jsonify({'mensaje': 'Notificación cargada exitosamente.'}), 201
 
 
-@notificaciones_bp.route('/mostrar', methods=['GET'])
+@notificaciones_bp.route('/', methods=['GET'])
 @jwt_required()
 def mostrar_notificaciones():
     try:
@@ -86,7 +85,7 @@ def mostrar_notificaciones():
         return jsonify({'error': 'Error interno del servidor al consultar notificaciones.', 'detalle': str(e)}), 500
 
 
-@notificaciones_bp.route('/leida/<int:consulta_id>', methods=['PUT'])
+@notificaciones_bp.route('/<int:consulta_id>', methods=['PATCH'])
 @jwt_required()
 def marcar_como_leida(consulta_id):
     notificacion = Consulta_Telegram.query.get(consulta_id)
