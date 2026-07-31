@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { X, MessageSquare } from "lucide-react"
+import { X, MessageSquare, Users } from "lucide-react"
 
 interface NavbarProps {
   isOpen: boolean
@@ -42,7 +42,7 @@ export const Navbar = ({ isOpen, onClose }: NavbarProps) => {
         </div>
 
         {/* Links de navegación */}
-        <nav className="mt-6 px-4">
+        <nav className="mt-6 px-4 space-y-1">
           <Link
             to="/notifications"
             onClick={onClose}
@@ -50,6 +50,14 @@ export const Navbar = ({ isOpen, onClose }: NavbarProps) => {
           >
             <MessageSquare size={20} />
             <span className="text-sm font-medium">Notificaciones</span>
+          </Link>
+          <Link
+            to="/clients"
+            onClick={onClose}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-text hover:bg-accent/10 hover:text-accent transition-colors duration-200"
+          >
+            <Users size={20} />
+            <span className="text-sm font-medium">Clientes</span>
           </Link>
         </nav>
       </aside>
