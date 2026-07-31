@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { useFetch } from "./useFetch"
-import type { Notification, NotificationResponse, NotificationPutResponse } from "../Types/notificacion"
+import type { Notification, NotificationResponse } from "../Types/notificacion"
 
 const API_URL = import.meta.env.VITE_API_URL as string
 
@@ -9,12 +9,12 @@ export const useNotifications = () => {
   const [leidas, setLeidas] = useState<Notification[]>([])
   const noLeidasRef = useRef(noLeidas)
   noLeidasRef.current = noLeidas
-  const { get, put, isLoading, error } = useFetch<NotificationResponse>(
+  const { get, patch, isLoading, error } = useFetch<NotificationResponse>(
     `${API_URL}/notificaciones`
   )
 
   const fetchNotifications = useCallback(async () => {
-    const data = await get("/mostrar")
+    const data = await get("/")
     if (data) {
       setNoLeidas(data.no_leidas)
       setLeidas(data.leidas)
@@ -22,7 +22,7 @@ export const useNotifications = () => {
   }, [get])
 
   const markAsRead = useCallback(async (consultaId: number) => {
-    const data = await put<NotificationPutResponse>("/leida", consultaId, {})
+    const data = await patch(consultaId)
     if (data) {
       const notif = noLeidasRef.current.find((n) => n.consulta_id === consultaId)
       if (notif) {
@@ -30,7 +30,7 @@ export const useNotifications = () => {
       }
       setNoLeidas((prev) => prev.filter((n) => n.consulta_id !== consultaId))
     }
-  }, [put])
+  }, [patch])
 
   useEffect(() => {
     fetchNotifications()
