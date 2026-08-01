@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { X, MessageSquare, Users } from "lucide-react"
+import { X, MessageSquare, Users, Wrench } from "lucide-react"
 
 interface NavbarProps {
   isOpen: boolean
@@ -58,6 +58,14 @@ export const Navbar = ({ isOpen, onClose }: NavbarProps) => {
           >
             <Users size={20} />
             <span className="text-sm font-medium">Clientes</span>
+          </Link>
+          <Link
+            to="/services"
+            onClick={onClose}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-text hover:bg-accent/10 hover:text-accent transition-colors duration-200"
+          >
+            <Wrench size={20} />
+            <span className="text-sm font-medium">Servicios</span>
           </Link>
         </nav>
       </aside>
