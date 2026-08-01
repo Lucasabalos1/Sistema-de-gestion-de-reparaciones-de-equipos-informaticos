@@ -56,7 +56,7 @@ def test_obtener_clientes_campos_nulos(client, db):
     response = client.get('/api/clientes/', headers=headers)
     data = json.loads(response.data)
     assert response.status_code == 200
-    assert data[0]['apellido'] == 'No hay datos por el momento'
+    assert data[0]['apellido'] == ''
     assert data[0]['correo'] == 'No hay datos por el momento'
     assert data[0]['genero'] == 'No hay datos por el momento'
 

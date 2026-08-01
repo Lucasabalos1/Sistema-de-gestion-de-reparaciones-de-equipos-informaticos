@@ -33,6 +33,7 @@ def setup_db(app):
         _db.session.execute(text("DELETE FROM turno"))
         _db.session.execute(text("DELETE FROM servicio"))
         _db.session.execute(text("DELETE FROM cliente"))
+        _db.session.execute(text("DELETE FROM inventario"))
         _db.session.execute(text("DELETE FROM administrador"))
         _db.session.execute(text("DELETE FROM consulta_telegram"))
         _db.session.commit()

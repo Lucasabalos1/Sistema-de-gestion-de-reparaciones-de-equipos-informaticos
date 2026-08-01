@@ -22,6 +22,9 @@ def create_app(config_class=Config):
     from app.routes.servicios import servicios_bp
     app.register_blueprint(servicios_bp, url_prefix='/api/servicios')
 
+    from app.routes.inventario import inventario_bp
+    app.register_blueprint(inventario_bp, url_prefix='/api/inventario')
+
     # Ruta de prueba base
     @app.route('/')
     def index():
