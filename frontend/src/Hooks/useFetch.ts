@@ -8,6 +8,7 @@ interface UseFetchReturn<T, P> {
   put: <R = T>(path: string, id: number | string, payload: Partial<P>) => Promise<R | null>
   patch: <R = T>(id: number | string, payload?: Partial<P>) => Promise<R | null>
   delete: (path: string, id: number | string) => Promise<boolean>
+  upload: <R = T>(path: string, formData: FormData) => Promise<R | null>
 }
 
 export const useFetch = <T, P = unknown>(baseUrl: string): UseFetchReturn<T, P> => {
@@ -16,21 +17,26 @@ export const useFetch = <T, P = unknown>(baseUrl: string): UseFetchReturn<T, P> 
 
   const getToken = (): string | null => localStorage.getItem("bytemend_token")
 
-  const getHeaders = (): HeadersInit => {
+  const getAuthHeaders = (): HeadersInit => {
     const token = getToken()
-    const headers: HeadersInit = { "Content-Type": "application/json" }
+    const headers: HeadersInit = {}
     if (token) {
       headers["Authorization"] = `Bearer ${token}`
     }
     return headers
   }
 
+  const getHeaders = (): HeadersInit => ({
+    "Content-Type": "application/json",
+    ...getAuthHeaders(),
+  })
+
   const request = useCallback(async <R>(url: string, options: RequestInit): Promise<R | null> => {
     setIsLoading(true)
     setError(null)
 
     try {
-      const response = await fetch(url, { ...options, headers: getHeaders() })
+      const response = await fetch(url, { ...options, headers: options.headers ?? getHeaders() })
 
       if (!response.ok) {
         const data = await response.json().catch(() => null)
@@ -78,5 +84,13 @@ export const useFetch = <T, P = unknown>(baseUrl: string): UseFetchReturn<T, P> 
     return result !== null
   }, [baseUrl, request])
 
-  return { isLoading, error, get, post, put, patch, delete: deleteFn }
+  const upload = useCallback(async <R = T>(path: string, formData: FormData): Promise<R | null> => {
+    return request<R>(`${baseUrl}${path}`, {
+      method: "POST",
+      body: formData,
+      headers: getAuthHeaders(),
+    })
+  }, [baseUrl, request])
+
+  return { isLoading, error, get, post, put, patch, delete: deleteFn, upload }
 }
