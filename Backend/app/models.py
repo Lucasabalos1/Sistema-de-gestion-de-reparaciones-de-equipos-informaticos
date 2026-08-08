@@ -52,6 +52,7 @@ class Turno(db.Model):
     extras = db.Column(db.String(255), nullable=True)
     estado_comercial = db.Column(db.String(32), nullable=False)
     estado_tecnico = db.Column(db.String(32), nullable=False)
+    cancelado = db.Column(db.Boolean, nullable=False, default=False)
 
     detalles = db.relationship('Turno_Detalle', backref='turno', lazy=True)
 
