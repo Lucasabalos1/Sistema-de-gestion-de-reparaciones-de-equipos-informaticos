@@ -6,7 +6,7 @@ interface UseFetchReturn<T, P> {
   get: <R = T>(path?: string) => Promise<R | null>
   post: <R = T>(path: string, payload: P) => Promise<R | null>
   put: <R = T>(path: string, id: number | string, payload: Partial<P>) => Promise<R | null>
-  patch: <R = T>(id: number | string, payload?: Partial<P>) => Promise<R | null>
+  patch: <R = T>(path: string, payload?: Partial<P>) => Promise<R | null>
   delete: (path: string, id: number | string) => Promise<boolean>
   upload: <R = T>(path: string, formData: FormData) => Promise<R | null>
 }
@@ -72,8 +72,8 @@ export const useFetch = <T, P = unknown>(baseUrl: string): UseFetchReturn<T, P> 
     })
   }, [baseUrl, request])
 
-  const patch = useCallback(async <R = T>(id: number | string, payload?: Partial<P>): Promise<R | null> => {
-    return request<R>(`${baseUrl}/${id}`, {
+  const patch = useCallback(async <R = T>(path: string, payload?: Partial<P>): Promise<R | null> => {
+    return request<R>(`${baseUrl}${path}`, {
       method: "PATCH",
       body: payload ? JSON.stringify(payload) : undefined,
     })

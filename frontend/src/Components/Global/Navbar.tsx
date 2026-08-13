@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { X, MessageSquare, Users, Wrench, Boxes } from "lucide-react"
+import { X, MessageSquare, Users, Wrench, Boxes, CalendarClock } from "lucide-react"
 
 interface NavbarProps {
   isOpen: boolean
@@ -74,6 +74,14 @@ export const Navbar = ({ isOpen, onClose }: NavbarProps) => {
           >
             <Boxes size={20} />
             <span className="text-sm font-medium">Inventario</span>
+          </Link>
+          <Link
+            to="/shifts"
+            onClick={onClose}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-text hover:bg-accent/10 hover:text-accent transition-colors duration-200"
+          >
+            <CalendarClock size={20} />
+            <span className="text-sm font-medium">Turnos</span>
           </Link>
         </nav>
       </aside>

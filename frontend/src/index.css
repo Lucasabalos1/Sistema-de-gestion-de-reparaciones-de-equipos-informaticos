@@ -55,3 +55,20 @@ body {
 .modal-content-hide {
   animation: scale-out 0.2s ease-in forwards;
 }
+
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: #111111;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #444444;
+}

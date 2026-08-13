@@ -14,11 +14,19 @@ export const Clientes = () => {
   const [editingCliente, setEditingCliente] = useState<Cliente | null>(null)
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null)
   const [deletingCliente, setDeletingCliente] = useState<Cliente | null>(null)
-  const { clientes, isLoading, error, fetchClientes, createCliente, updateCliente, deleteCliente } = useClientes()
+  const { clientes, isLoading, error, fetchClientes, createCliente, updateCliente, deleteCliente, searchCliente } = useClientes()
 
   const handleFormClose = () => {
     setShowFormModal(false)
     setEditingCliente(null)
+  }
+
+  const handleBuscar = async () => {
+    if (searchTerm.trim()) {
+      await searchCliente(searchTerm)
+    } else {
+      await fetchClientes()
+    }
   }
 
   const handleEdit = (cliente: Cliente) => {
@@ -66,13 +74,14 @@ export const Clientes = () => {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleBuscar() } }}
               placeholder="Ingresa un numero telefonico y presiona buscar"
               className="w-full px-4 py-2.5 pr-10 rounded-lg bg-surface border-2 border-muted text-text text-sm placeholder-text-muted/60 outline-none focus:border-accent transition-colors duration-200"
             />
             {searchTerm && (
               <button
                 type="button"
-                onClick={() => setSearchTerm("")}
+                onClick={() => { setSearchTerm(""); fetchClientes() }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text transition-colors duration-200 cursor-pointer"
               >
                 <X size={16} />
@@ -81,6 +90,7 @@ export const Clientes = () => {
           </div>
           <button
             type="button"
+            onClick={handleBuscar}
             className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/80 transition-colors duration-200 cursor-pointer shrink-0"
           >
             <Search size={16} />
