@@ -28,6 +28,12 @@ def create_app(config_class=Config):
     from app.routes.turnos import turnos_bp
     app.register_blueprint(turnos_bp, url_prefix='/api/turnos')
 
+    from app.routes.metricas import metricas_bp
+    app.register_blueprint(metricas_bp, url_prefix='/api/metricas')
+
+    from app.routes.dashboard import dashboard_bp
+    app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
+
     # Ruta de prueba base
     @app.route('/')
     def index():
