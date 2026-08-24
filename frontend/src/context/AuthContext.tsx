@@ -12,6 +12,7 @@ export interface AuthContextType {
   user: User | null
   token: string | null
   isAuthenticated: boolean
+  isLoading: boolean
   login: (token: string, userData: User) => void
   logout: () => void
 }
@@ -21,6 +22,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const storedToken = localStorage.getItem("bytemend_token")
@@ -29,6 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setToken(storedToken)
       setUser(JSON.parse(storedUser))
     }
+    setIsLoading(false)
   }, [])
 
   const login = (newToken: string, userData: User) => {
@@ -48,7 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = token !== null
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isAuthenticated, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

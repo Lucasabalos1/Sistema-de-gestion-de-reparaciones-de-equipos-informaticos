@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { X, MessageSquare, Users, Wrench, Boxes, CalendarClock } from "lucide-react"
+import { X, Home, MessageSquare, Users, Wrench, Boxes, CalendarClock, BarChart3 } from "lucide-react"
 
 interface NavbarProps {
   isOpen: boolean
@@ -36,13 +36,21 @@ export const Navbar = ({ isOpen, onClose }: NavbarProps) => {
 
         {/* Título centrado */}
         <div className="flex items-center justify-center mt-4 px-4">
-          <h2 className="text-primary text-sm font-bold tracking-wide text-center">
+          <h2 className="text-gradient-primary text-sm font-bold tracking-wide text-center">
             ByteMend - Menú de navegación
           </h2>
         </div>
 
         {/* Links de navegación */}
         <nav className="mt-6 px-4 space-y-1">
+          <Link
+            to="/home"
+            onClick={onClose}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-text hover:bg-accent/10 hover:text-accent transition-colors duration-200"
+          >
+            <Home size={20} />
+            <span className="text-sm font-medium">Inicio</span>
+          </Link>
           <Link
             to="/notifications"
             onClick={onClose}
@@ -82,6 +90,14 @@ export const Navbar = ({ isOpen, onClose }: NavbarProps) => {
           >
             <CalendarClock size={20} />
             <span className="text-sm font-medium">Turnos</span>
+          </Link>
+          <Link
+            to="/metrics"
+            onClick={onClose}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-text hover:bg-accent/10 hover:text-accent transition-colors duration-200"
+          >
+            <BarChart3 size={20} />
+            <span className="text-sm font-medium">Métricas</span>
           </Link>
         </nav>
       </aside>
