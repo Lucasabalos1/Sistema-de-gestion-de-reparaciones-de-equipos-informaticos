@@ -162,14 +162,14 @@ def test_obtener_turnos_reparando_reciente_se_incluye(client, db):
     assert [t['titulo'] for t in data['Reparando']] == ['Reciente']
 
 
-def test_obtener_turnos_reparando_viejo_se_excluye(client, db):
+def test_obtener_turnos_reparando_viejo_se_incluye(client, db):
     headers = get_auth_headers(client, db)
     cliente = crear_cliente_db(db)
     crear_turno_db(db, cliente.cliente_id, titulo='Viejo', estado_tecnico='Reparando',
                    fecha_entrada=date.today() - timedelta(days=10))
     response = client.get('/api/turnos/', headers=headers)
     data = response.get_json()
-    assert data['Reparando'] == []
+    assert [t['titulo'] for t in data['Reparando']] == ['Viejo']
 
 
 def test_obtener_turnos_sin_solucion_limite_semana(client, db):
@@ -189,6 +189,8 @@ def test_obtener_turnos_limite_semana_no_afecta_otros_estados(client, db):
     cliente = crear_cliente_db(db)
     crear_turno_db(db, cliente.cliente_id, titulo='Espera viejo', estado_tecnico='En espera',
                    fecha_entrada=date.today() - timedelta(days=60))
+    crear_turno_db(db, cliente.cliente_id, titulo='Reparado reciente', estado_tecnico='Reparado',
+                   fecha_entrada=date.today() - timedelta(days=3))
     crear_turno_db(db, cliente.cliente_id, titulo='Reparado viejo', estado_tecnico='Reparado',
                    fecha_entrada=date.today() - timedelta(days=60))
     crear_turno_db(db, cliente.cliente_id, titulo='Stock viejo', estado_tecnico='En espera de stock',
@@ -196,7 +198,7 @@ def test_obtener_turnos_limite_semana_no_afecta_otros_estados(client, db):
     response = client.get('/api/turnos/', headers=headers)
     data = response.get_json()
     assert [t['titulo'] for t in data['En espera']] == ['Espera viejo']
-    assert [t['titulo'] for t in data['Reparado']] == ['Reparado viejo']
+    assert [t['titulo'] for t in data['Reparado']] == ['Reparado reciente']
     assert [t['titulo'] for t in data['En espera de stock']] == ['Stock viejo']
 
 
@@ -697,7 +699,8 @@ def test_editar_turno_exitoso_con_reconciliacion(client, db):
     assert sum(d.precio_historico for d in detalles) == 23000
 
     turno_data = client.get('/api/turnos/', headers=headers).get_json()['Reparando']
-    assert turno_data == []
+    assert len(turno_data) == 1
+    assert turno_data[0]['titulo'] == 'PC arreglada'
 
 
 def test_editar_turno_transicion_a_reparado_setea_fecha_salida(client, db):

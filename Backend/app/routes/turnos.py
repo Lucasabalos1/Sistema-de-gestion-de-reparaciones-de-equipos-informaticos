@@ -48,7 +48,7 @@ def obtenerTurnos():
         turnos = Turno.query.all()
 
         corte = date.today() - timedelta(days=7)
-        estados_limitados = ["Reparando", "Sin solución"]
+        estados_limitados = ["Reparado", "Sin solución"]
 
         agrupados = {estado: [] for estado in ESTADOS_TECNICOS}
         for turno in turnos:
