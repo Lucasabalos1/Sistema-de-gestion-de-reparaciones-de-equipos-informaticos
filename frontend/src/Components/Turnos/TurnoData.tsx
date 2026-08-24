@@ -55,6 +55,8 @@ export const TurnoData = ({ isOpen, turno, onClose, onEdit, onCancelar, onCambia
     }
   }
 
+  const puedeCancelar = !turno.cancelado && turno.estado_tecnico !== "Reparado"
+
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm ${isClosing ? "modal-hide" : "modal-show"}`}
@@ -194,7 +196,7 @@ export const TurnoData = ({ isOpen, turno, onClose, onEdit, onCancelar, onCambia
           <button
             type="button"
             onClick={onCancelar}
-            disabled={turno.cancelado}
+            disabled={!puedeCancelar}
             className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-danger/10 text-danger text-sm font-medium hover:bg-danger/20 transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Ban size={16} />
