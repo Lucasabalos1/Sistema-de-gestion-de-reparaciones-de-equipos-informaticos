@@ -92,12 +92,12 @@ export const Dashboard = () => {
 
             {/* Accesos rápidos */}
             <h2 className="text-text-muted text-sm mb-3 animate-fade-in-up delay-375">Accesos rápidos</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 lg:gap-4">
-              {MODULOS.map((mod, index) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 lg:gap-4 animate-fade-in-up delay-375">
+              {MODULOS.map((mod) => (
                 <Link
                   key={mod.ruta}
                   to={mod.ruta}
-                  className={`bg-surface border border-muted rounded-xl p-5 flex flex-col items-center gap-3 hover:border-accent/50 hover:bg-accent/5 transition-all duration-200 group card-glow animate-fade-in-up delay-${(index + 4) * 75}`}
+                  className="bg-surface border border-muted rounded-xl p-5 flex flex-col items-center gap-3 hover:border-accent/50 hover:bg-accent/5 transition-all duration-200 group card-glow"
                 >
                   <mod.icono size={28} className="text-text-muted group-hover:text-accent transition-all duration-200 group-hover:scale-110" />
                   <span className="text-text text-sm font-medium group-hover:text-accent transition-colors duration-200">{mod.nombre}</span>

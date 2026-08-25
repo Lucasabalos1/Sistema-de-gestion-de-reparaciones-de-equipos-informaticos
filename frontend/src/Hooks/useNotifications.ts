@@ -22,7 +22,7 @@ export const useNotifications = () => {
   }, [get])
 
   const markAsRead = useCallback(async (consultaId: number) => {
-    const data = await patch(consultaId)
+    const data = await patch(`/${consultaId}`)
     if (data) {
       const notif = noLeidasRef.current.find((n) => n.consulta_id === consultaId)
       if (notif) {

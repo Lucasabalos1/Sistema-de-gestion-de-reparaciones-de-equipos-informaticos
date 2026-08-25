@@ -9,10 +9,10 @@ export const Notificaciones = () => {
   return (
     <Layout>
       <div className="w-full max-w-6xl">
-        <h1 className="text-3xl font-bold text-primary text-center">
+        <h1 className="text-3xl font-bold text-primary">
           Notificaciones
         </h1>
-        <div className="mt-2 mb-8 border-b-2 border-muted w-full" />
+        <div className="mt-3 mb-6 border-b-2 border-muted w-full" />
 
         {/* Loading */}
         {isLoading && (
