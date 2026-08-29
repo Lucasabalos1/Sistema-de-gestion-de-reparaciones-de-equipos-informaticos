@@ -1,6 +1,6 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.extensions import db
+from app.extensions import db, limiter
 from app.models import Inventario
 from app.utils.csv_utils import procesar_csv_inventario
 
@@ -28,14 +28,15 @@ def obtenerInventario():
 
         return jsonify(resultado), 200
 
-    except Exception as e:
-        return jsonify({'error': 'Error interno del servidor al consultar el inventario.', 'detalle': str(e)}), 500
+    except Exception:
+        current_app.logger.exception("Error al consultar inventario")
+        return jsonify({'error': 'Error interno del servidor al consultar el inventario.'}), 500
 
 
 @inventario_bp.route('/', methods=['POST'])
 @jwt_required()
 def cargarInventario():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
     required_fields = ['admin_id', 'nombre', 'stock', 'precio_unidad']
     for field in required_fields:
@@ -64,9 +65,10 @@ def cargarInventario():
 
         return jsonify({'message': 'El repuesto se registró correctamente'}), 201
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al registrar el repuesto.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al registrar repuesto")
+        return jsonify({'error': 'Error interno del servidor al registrar el repuesto.'}), 500
 
 
 @inventario_bp.route('/<string:nombre_inventario>', methods=['GET'])
@@ -95,14 +97,15 @@ def obtenerInventarioPorNombre(nombre_inventario):
 
         return jsonify(resultado), 200
 
-    except Exception as e:
-        return jsonify({'error': 'Error interno del servidor al buscar el repuesto.', 'detalle': str(e)}), 500
+    except Exception:
+        current_app.logger.exception("Error al buscar repuesto por nombre")
+        return jsonify({'error': 'Error interno del servidor al buscar el repuesto.'}), 500
 
 
 @inventario_bp.route('/<int:id_inventario>', methods=['PUT'])
 @jwt_required()
 def editarInventario(id_inventario):
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
     required_fields = ['admin_id', 'nombre', 'stock', 'precio_unidad']
     for field in required_fields:
@@ -133,13 +136,15 @@ def editarInventario(id_inventario):
 
         return jsonify({'message': 'El repuesto se editó correctamente'}), 200
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al editar el repuesto.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al editar repuesto")
+        return jsonify({'error': 'Error interno del servidor al editar el repuesto.'}), 500
 
 
 @inventario_bp.route('/csv', methods=['POST'])
 @jwt_required()
+@limiter.limit("3 per minute")
 def cargarInventarioPorCsv():
     archivo = request.files.get('archivo')
 
@@ -179,7 +184,8 @@ def cargarInventarioPorCsv():
 
         return jsonify({'message': 'El inventario se cargó correctamente'}), 201
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al cargar el inventario.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al cargar inventario por CSV")
+        return jsonify({'error': 'Error interno del servidor al cargar el inventario.'}), 500
 

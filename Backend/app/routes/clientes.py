@@ -1,6 +1,6 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required
-from app.extensions import db
+from app.extensions import db, limiter
 from app.models import Cliente
 
 clientes_bp = Blueprint('clientes', __name__)
@@ -29,14 +29,15 @@ def obtenerClientes():
 
         return jsonify(resultado), 200
 
-    except Exception as e:
-        return jsonify({'error': 'Error interno del servidor al consultar clientes.', 'detalle': str(e)}), 500
+    except Exception:
+        current_app.logger.exception("Error al consultar clientes")
+        return jsonify({'error': 'Error interno del servidor al consultar clientes.'}), 500
 
 
 @clientes_bp.route('/', methods=['POST'])
 @jwt_required()
 def crearCliente():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
     required_fields = ['admin_id', 'nombre', 'telefono']
     for field in required_fields:
@@ -65,15 +66,16 @@ def crearCliente():
 
         return jsonify({'message': 'El cliente se registró correctamente'}), 201
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al registrar el cliente.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al registrar cliente")
+        return jsonify({'error': 'Error interno del servidor al registrar el cliente.'}), 500
 
 
 @clientes_bp.route('/<int:id_cliente>', methods=['PUT'])
 @jwt_required()
 def editarCliente(id_cliente):
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
     required_fields = ['admin_id', 'nombre', 'telefono']
     for field in required_fields:
@@ -104,13 +106,15 @@ def editarCliente(id_cliente):
 
         return jsonify({'message': 'El cliente se editó correctamente'}), 200
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al editar el cliente.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al editar cliente")
+        return jsonify({'error': 'Error interno del servidor al editar el cliente.'}), 500
 
 
 @clientes_bp.route('/<int:id_cliente>', methods=['DELETE'])
 @jwt_required()
+@limiter.limit("10 per minute")
 def eliminarCliente(id_cliente):
     cliente = Cliente.query.get(id_cliente)
     if not cliente:
@@ -122,9 +126,10 @@ def eliminarCliente(id_cliente):
 
         return jsonify({'message': 'El cliente se eliminó correctamente'}), 200
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al eliminar el cliente.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al eliminar cliente")
+        return jsonify({'error': 'Error interno del servidor al eliminar el cliente.'}), 500
 
 
 @clientes_bp.route('/<string:telefono_cliente>', methods=['GET'])
@@ -149,6 +154,7 @@ def obtenerCliente(telefono_cliente):
             'genero': cliente.genero if cliente.genero else "No hay datos por el momento"
         }), 200
 
-    except Exception as e:
-        return jsonify({'error': 'Error interno del servidor al buscar el cliente.', 'detalle': str(e)}), 500
+    except Exception:
+        current_app.logger.exception("Error al buscar cliente por teléfono")
+        return jsonify({'error': 'Error interno del servidor al buscar el cliente.'}), 500
 

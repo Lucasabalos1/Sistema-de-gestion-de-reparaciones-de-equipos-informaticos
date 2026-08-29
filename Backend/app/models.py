@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timezone
 from app.extensions import db
 
 
@@ -88,3 +88,11 @@ class Consulta_Telegram(db.Model):
     resumen_ia = db.Column(db.Text, nullable=True)
     mensaje_original = db.Column(db.Text, nullable=False)
     leido = db.Column(db.Boolean, nullable=False, default=False)
+
+
+class TokenBlocklist(db.Model):
+    __tablename__ = 'token_blocklist'
+
+    id = db.Column(db.Integer, primary_key=True)
+    jti = db.Column(db.String(36), nullable=False, index=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))

@@ -1,6 +1,6 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required
-from app.extensions import db
+from app.extensions import db, limiter
 from app.models import Turno, Consulta_Telegram
 from sqlalchemy import extract
 
@@ -12,8 +12,9 @@ MESES_VALIDOS = list(range(1, 13))
 
 @metricas_bp.route('/mensual', methods=['POST'])
 @jwt_required()
+@limiter.limit("10 per minute")
 def metricas_mensuales():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     mes = data.get('mes')
     anio = data.get('anio')
 
@@ -91,8 +92,9 @@ def metricas_mensuales():
 
 @metricas_bp.route('/global', methods=['POST'])
 @jwt_required()
+@limiter.limit("5 per minute")
 def metricas_globales():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     anio = data.get('anio')
     if not anio:
         from datetime import date

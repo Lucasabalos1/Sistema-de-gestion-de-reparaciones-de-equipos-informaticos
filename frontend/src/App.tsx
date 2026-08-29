@@ -7,6 +7,7 @@ import { Servicios } from "./Pages/Servicios";
 import { Inventario } from "./Pages/Inventario";
 import { Turnos } from "./Pages/Turnos";
 import { Metricas } from "./Pages/Metricas";
+import { NotFound } from "./Pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./Components/Global/protectedRoute";
 
@@ -24,6 +25,7 @@ export const App = () => {
           <Route path="/shifts" element={<ProtectedRoute><Turnos/></ProtectedRoute>} />
           <Route path="/metrics" element={<ProtectedRoute><Metricas/></ProtectedRoute>} />
           <Route path='/' element={<Navigate to="/login" />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
     </>

@@ -1,8 +1,8 @@
 from datetime import date, timedelta
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required
-from app.extensions import db
+from app.extensions import db, limiter
 from app.models import Turno, Turno_Detalle, Servicio, Cliente
 
 turnos_bp = Blueprint('turnos', __name__)
@@ -43,6 +43,7 @@ def mapear_turno(n):
 
 @turnos_bp.route('/', methods=['GET'])
 @jwt_required()
+@limiter.limit("20 per minute")
 def obtenerTurnos():
     try:
         turnos = Turno.query.all()
@@ -58,12 +59,14 @@ def obtenerTurnos():
 
         return jsonify(agrupados), 200
 
-    except Exception as e:
-        return jsonify({'error': 'Error interno del servidor al consultar los turnos.', 'detalle': str(e)}), 500
+    except Exception:
+        current_app.logger.exception("Error al consultar turnos")
+        return jsonify({'error': 'Error interno del servidor al consultar los turnos.'}), 500
 
 
 @turnos_bp.route('/historial', methods=['GET'])
 @jwt_required()
+@limiter.limit("20 per minute")
 def obtenerHistorial():
     try:
         turnos = Turno.query.filter(db.or_(
@@ -80,14 +83,15 @@ def obtenerHistorial():
 
         return jsonify(resultado), 200
 
-    except Exception as e:
-        return jsonify({'error': 'Error interno del servidor al consultar el historial de turnos.', 'detalle': str(e)}), 500
+    except Exception:
+        current_app.logger.exception("Error al consultar historial de turnos")
+        return jsonify({'error': 'Error interno del servidor al consultar el historial de turnos.'}), 500
 
 
 @turnos_bp.route('/', methods=['POST'])
 @jwt_required()
 def crearTurno():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
     required_fields = ['cliente_id', 'titulo', 'descripcion', 'servicios']
     for field in required_fields:
@@ -158,15 +162,17 @@ def crearTurno():
 
         return jsonify({'message': 'El turno se registró correctamente'}), 201
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al registrar el turno.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al registrar turno")
+        return jsonify({'error': 'Error interno del servidor al registrar el turno.'}), 500
 
 
 @turnos_bp.route('/<int:id_turno>', methods=['PUT'])
 @jwt_required()
+@limiter.limit("20 per minute")
 def editarTurno(id_turno):
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
     required_fields = ['cliente_id', 'titulo', 'descripcion', 'servicios', 'estado_comercial', 'estado_tecnico']
     for field in required_fields:
@@ -241,9 +247,10 @@ def editarTurno(id_turno):
 
         return jsonify({'message': 'El turno se editó correctamente'}), 200
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al editar el turno.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al editar turno")
+        return jsonify({'error': 'Error interno del servidor al editar el turno.'}), 500
 
 
 @turnos_bp.route('/<int:id_turno>/estado-comercial', methods=['PATCH'])
@@ -253,7 +260,7 @@ def editarEstadoComercial(id_turno):
     if not turno:
         return jsonify({'error': 'Turno no encontrado.'}), 404
 
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     estado_comercial = data.get('estado_comercial')
 
     if not estado_comercial:
@@ -268,9 +275,10 @@ def editarEstadoComercial(id_turno):
 
         return jsonify({'message': 'El estado comercial se actualizó correctamente'}), 200
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al actualizar el estado comercial.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al actualizar estado comercial del turno")
+        return jsonify({'error': 'Error interno del servidor al actualizar el estado comercial.'}), 500
 
 
 @turnos_bp.route('/<int:id_turno>/estado-tecnico', methods=['PATCH'])
@@ -280,7 +288,7 @@ def editarEstadoTecnico(id_turno):
     if not turno:
         return jsonify({'error': 'Turno no encontrado.'}), 404
 
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     estado_tecnico = data.get('estado_tecnico')
 
     if not estado_tecnico:
@@ -300,9 +308,10 @@ def editarEstadoTecnico(id_turno):
 
         return jsonify({'message': 'El estado técnico se actualizó correctamente'}), 200
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al actualizar el estado técnico.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al actualizar estado técnico del turno")
+        return jsonify({'error': 'Error interno del servidor al actualizar el estado técnico.'}), 500
 
 
 @turnos_bp.route('/<int:id_turno>/cancelar', methods=['PATCH'])
@@ -321,6 +330,7 @@ def editarCancelacion(id_turno):
 
         return jsonify({'message': 'El turno se canceló correctamente'}), 200
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al cancelar el turno.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al cancelar turno")
+        return jsonify({'error': 'Error interno del servidor al cancelar el turno.'}), 500

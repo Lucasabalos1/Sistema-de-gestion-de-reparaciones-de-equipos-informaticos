@@ -90,7 +90,7 @@ export const Turnos = () => {
                     </div>
                 )}
 
-                {!isLoading && error && (
+                {!isLoading && error && error !== "No hay turnos en el historial" && (
                     <div className="flex items-center gap-3 p-4 rounded-lg bg-danger/10 border border-danger/30 mb-6">
                         <AlertCircle size={20} className="text-danger shrink-0" />
                         <div className="flex-1">

@@ -1,5 +1,10 @@
 import { useState, useCallback } from "react"
 
+const API_BASE = import.meta.env.VITE_API_URL as string
+
+let refreshInFlight: Promise<boolean> | null = null
+let hasDispatchedSessionExpired = false
+
 interface UseFetchReturn<T, P> {
   isLoading: boolean
   error: string | null
@@ -31,16 +36,69 @@ export const useFetch = <T, P = unknown>(baseUrl: string): UseFetchReturn<T, P> 
     ...getAuthHeaders(),
   })
 
+  const clearSession = () => {
+    localStorage.removeItem("bytemend_token")
+    localStorage.removeItem("bytemend_refresh_token")
+    localStorage.removeItem("bytemend_user")
+    if (!refreshInFlight && !hasDispatchedSessionExpired) {
+      hasDispatchedSessionExpired = true
+      window.dispatchEvent(new Event("bytemend:session-expired"))
+    }
+  }
+
+  const refreshAccessToken = (): Promise<boolean> => {
+    if (refreshInFlight) return refreshInFlight
+
+    hasDispatchedSessionExpired = false
+    refreshInFlight = (async () => {
+      const refreshToken = localStorage.getItem("bytemend_refresh_token")
+      if (!refreshToken) return false
+      try {
+        const response = await fetch(`${API_BASE}/auth/refresh`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${refreshToken}`,
+          },
+        })
+        if (!response.ok) return false
+        const data = await response.json()
+        if (data?.token) {
+          localStorage.setItem("bytemend_token", data.token)
+          return true
+        }
+        return false
+      } catch {
+        return false
+      }
+    })().finally(() => {
+      refreshInFlight = null
+    })
+    return refreshInFlight
+  }
+
+  const shouldAttemptRefresh = (url: string): boolean =>
+    !url.includes("/auth/login") && !url.includes("/auth/refresh")
+
   const request = useCallback(async <R>(url: string, options: RequestInit): Promise<R | null> => {
     setIsLoading(true)
     setError(null)
 
     try {
-      const response = await fetch(url, { ...options, headers: options.headers ?? getHeaders() })
+      let response = await fetch(url, { ...options, headers: options.headers ?? getHeaders() })
+
+      if (response.status === 401 && shouldAttemptRefresh(url)) {
+        const refreshed = await refreshAccessToken()
+        if (refreshed) {
+          response = await fetch(url, { ...options, headers: getHeaders() })
+        } else {
+          clearSession()
+        }
+      }
 
       if (!response.ok) {
         const data = await response.json().catch(() => null)
-        setError(data?.error || data?.message || `Error ${response.status}`)
+        setError(data?.error || data?.message || data?.msg || `Error ${response.status}`)
         return null
       }
 

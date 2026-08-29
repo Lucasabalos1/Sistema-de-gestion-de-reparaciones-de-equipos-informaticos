@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from flask_jwt_extended import jwt_required
-from app.extensions import db
+from app.extensions import db, limiter
 from app.models import Turno, Consulta_Telegram
 from sqlalchemy import extract
 from datetime import date
@@ -12,6 +12,7 @@ ESTADOS_ACTIVOS = ["En espera", "Reparando", "En espera de stock"]
 
 @dashboard_bp.route('/resumen', methods=['GET'])
 @jwt_required()
+@limiter.limit("30 per minute")
 def resumen():
     today = date.today()
     mes_actual = today.month

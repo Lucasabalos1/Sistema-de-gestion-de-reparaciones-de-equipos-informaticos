@@ -3,7 +3,7 @@ from functools import wraps
 
 from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required
-from app.extensions import db
+from app.extensions import db, limiter
 from app.models import Consulta_Telegram
 
 notificaciones_bp = Blueprint('notificaciones', __name__)
@@ -34,8 +34,9 @@ def mapear_notificacion(n):
 
 @notificaciones_bp.route('/', methods=['POST'])
 @require_api_key
+@limiter.limit("10 per minute")
 def cargar_notificacion():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
     if not data or 'card_backend' not in data:
         return jsonify({'error': 'El payload debe contener la clave "card_backend".'}), 400
@@ -59,9 +60,10 @@ def cargar_notificacion():
         )
         db.session.add(notificacion)
         db.session.commit()
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al guardar la notificación.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al guardar notificación")
+        return jsonify({'error': 'Error interno del servidor al guardar la notificación.'}), 500
 
     return jsonify({'mensaje': 'Notificación cargada exitosamente.'}), 201
 
@@ -81,8 +83,9 @@ def mostrar_notificaciones():
             'leidas': [mapear_notificacion(n) for n in leidas],
             'no_leidas': [mapear_notificacion(n) for n in no_leidas]
         }), 200
-    except Exception as e:
-        return jsonify({'error': 'Error interno del servidor al consultar notificaciones.', 'detalle': str(e)}), 500
+    except Exception:
+        current_app.logger.exception("Error al consultar notificaciones")
+        return jsonify({'error': 'Error interno del servidor al consultar notificaciones.'}), 500
 
 
 @notificaciones_bp.route('/<int:consulta_id>', methods=['PATCH'])
@@ -96,8 +99,9 @@ def marcar_como_leida(consulta_id):
     try:
         notificacion.leido = True
         db.session.commit()
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al marcar la notificación.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al marcar notificación como leída")
+        return jsonify({'error': 'Error interno del servidor al marcar la notificación.'}), 500
 
     return jsonify({'mensaje': 'Notificación marcada como leída.'}), 200

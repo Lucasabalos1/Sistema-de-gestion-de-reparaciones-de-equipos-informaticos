@@ -5,6 +5,7 @@ import type { User } from "../context/AuthContext"
 
 interface LoginResponse {
     token: string
+    refresh_token: string
     usuario: User
 }
 
@@ -18,7 +19,7 @@ export const useLogin = () => {
     const handleLogin = async (usuario: string, contraseña: string) => {
         const data = await post("/auth/login", { usuario, contraseña })
         if (data) {
-            login(data.token, data.usuario)
+            login(data.token, data.usuario, data.refresh_token)
             navigate("/home")
         }
     }

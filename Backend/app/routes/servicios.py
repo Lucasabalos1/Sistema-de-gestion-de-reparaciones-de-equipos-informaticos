@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required
 from app.extensions import db
 from app.models import Servicio
@@ -26,14 +26,15 @@ def obtenerServicios():
 
         return jsonify(resultado), 200
 
-    except Exception as e:
-        return jsonify({'error': 'Error interno del servidor al consultar servicios.', 'detalle': str(e)}), 500
+    except Exception:
+        current_app.logger.exception("Error al consultar servicios")
+        return jsonify({'error': 'Error interno del servidor al consultar servicios.'}), 500
 
 
 @servicios_bp.route('/', methods=['POST'])
 @jwt_required()
 def crearServicio():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
     required_fields = ['nombre', 'precio']
     for field in required_fields:
@@ -54,9 +55,10 @@ def crearServicio():
 
         return jsonify({'message': 'El servicio se registró correctamente'}), 201
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al registrar el servicio.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al registrar servicio")
+        return jsonify({'error': 'Error interno del servidor al registrar el servicio.'}), 500
 
 
 @servicios_bp.route('/<int:id_servicio>', methods=['PUT'])
@@ -82,9 +84,10 @@ def editarServicio(id_servicio):
 
         return jsonify({'message': 'El servicio se editó correctamente'}), 200
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        return jsonify({'error': 'Error interno del servidor al editar el servicio.', 'detalle': str(e)}), 500
+        current_app.logger.exception("Error al editar servicio")
+        return jsonify({'error': 'Error interno del servidor al editar el servicio.'}), 500
 
 
 @servicios_bp.route('/<string:nombre_servicio>', methods=['GET'])
@@ -112,6 +115,7 @@ def obtenerServicio(nombre_servicio):
 
         return jsonify(resultado), 200
 
-    except Exception as e:
-        return jsonify({'error': 'Error interno del servidor al buscar el servicio.', 'detalle': str(e)}), 500
+    except Exception:
+        current_app.logger.exception("Error al buscar servicio por nombre")
+        return jsonify({'error': 'Error interno del servidor al buscar el servicio.'}), 500
 
