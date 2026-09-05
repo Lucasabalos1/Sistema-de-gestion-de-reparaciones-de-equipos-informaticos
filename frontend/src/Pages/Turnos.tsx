@@ -60,8 +60,8 @@ export const Turnos = () => {
                     <div className="flex w-full sm:w-auto sm:inline-flex p-1 rounded-lg bg-surface border border-muted gap-1">
                         <button
                             type="button"
-                            onClick={() => setActiveTab("tablero")}
-                            className={`flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-2 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer ${
+onClick={() => setActiveTab("tablero")}
+                                    className={`flex-1 sm:flex-none px-6 sm:px-10 py-2.5 sm:py-2 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer ${
                                 activeTab === "tablero"
                                     ? "bg-accent text-white"
                                     : "text-text-muted hover:text-text"
@@ -71,8 +71,8 @@ export const Turnos = () => {
                         </button>
                         <button
                             type="button"
-                            onClick={() => setActiveTab("historial")}
-                            className={`flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-2 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer ${
+onClick={() => setActiveTab("historial")}
+                                    className={`flex-1 sm:flex-none px-6 sm:px-10 py-2.5 sm:py-2 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer ${
                                 activeTab === "historial"
                                     ? "bg-accent text-white"
                                     : "text-text-muted hover:text-text"

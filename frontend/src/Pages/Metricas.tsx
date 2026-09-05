@@ -55,29 +55,31 @@ export const Metricas = () => {
         <div className="mt-3 mb-6 border-b-2 border-muted w-full" />
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
-          <button
-            type="button"
-            onClick={() => setActiveTab("mensual")}
-            className={`flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 cursor-pointer ${
-              activeTab === "mensual"
-                ? "bg-accent text-white"
-                : "bg-surface border border-muted text-text-muted hover:text-text hover:border-text-muted"
-            }`}
-          >
-            Mensuales
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("global")}
-            className={`flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 cursor-pointer ${
-              activeTab === "global"
-                ? "bg-accent text-white"
-                : "bg-surface border border-muted text-text-muted hover:text-text hover:border-text-muted"
-            }`}
-          >
-            Anuales
-          </button>
+        <div className="flex justify-center mb-6">
+          <div className="flex w-full sm:w-auto sm:inline-flex p-1 rounded-lg bg-surface border border-muted gap-1">
+            <button
+              type="button"
+              onClick={() => setActiveTab("mensual")}
+              className={`flex-1 sm:flex-none px-6 sm:px-10 py-2.5 sm:py-2 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer ${
+                activeTab === "mensual"
+                  ? "bg-accent text-white"
+                  : "text-text-muted hover:text-text"
+              }`}
+            >
+              Mensuales
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("global")}
+              className={`flex-1 sm:flex-none px-6 sm:px-10 py-2.5 sm:py-2 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer ${
+                activeTab === "global"
+                  ? "bg-accent text-white"
+                  : "text-text-muted hover:text-text"
+              }`}
+            >
+              Anuales
+            </button>
+          </div>
         </div>
 
         {/* Filtros */}
@@ -98,7 +100,7 @@ export const Metricas = () => {
               </select>
             </div>
           )}
-          <div className={`${activeTab === "mensual" ? "flex-1" : "w-full sm:w-64"}`}>
+          <div className={`${activeTab === "mensual" ? "flex-1" : "w-full sm:w-80 sm:mx-auto"}`}>
             <label className="block text-text-muted text-base mb-2 text-center.5">Año</label>
             <select
               value={anioSeleccionado}

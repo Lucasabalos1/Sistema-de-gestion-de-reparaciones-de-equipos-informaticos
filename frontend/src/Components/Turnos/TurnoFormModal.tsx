@@ -171,20 +171,20 @@ export const TurnoFormModal = ({ isOpen, onClose, turno, onSubmit }: TurnoFormMo
             <X size={20} />
           </button>
 
-          <h2 className="text-primary text-xl font-bold mb-6 pr-6">
+          <h2 className="text-primary text-xl font-bold mb-3 pr-6">
             {isEditing ? "Editar turno" : "Crear turno"}
           </h2>
 
           <form
             onSubmit={(e) => { e.preventDefault(); handleSubmit() }}
-            className="space-y-4"
+            className="space-y-3"
           >
             <div>
               <label className="block text-text text-sm font-medium mb-1">
                 Cliente
               </label>
               <div className="flex items-center gap-2">
-                <div className={`flex-1 rounded-lg px-3 py-2 bg-background border-2 ${errores.cliente ? "border-danger" : "border-muted"}`}>
+                <div className={`flex-1 rounded-lg px-3 py-1.5 bg-background border-2 ${errores.cliente ? "border-danger" : "border-muted"}`}>
                   {cliente ? (
                     <p className="text-text text-sm truncate">
                       {cliente.nombre} {cliente.apellido}
@@ -215,7 +215,7 @@ export const TurnoFormModal = ({ isOpen, onClose, turno, onSubmit }: TurnoFormMo
                 value={titulo}
                 onChange={(e) => { setTitulo(e.target.value); setErrores((prev) => ({ ...prev, titulo: "" })) }}
                 placeholder="Ingresa el título del turno"
-                className={`w-full px-3 py-2 rounded-lg bg-background border-2 text-text text-sm placeholder-text-muted/60 outline-none transition-colors duration-200 ${errores.titulo ? "border-danger" : "border-muted focus:border-accent"}`}
+                className={`w-full px-3 py-1.5 rounded-lg bg-background border-2 text-text text-sm placeholder-text-muted/60 outline-none transition-colors duration-200 ${errores.titulo ? "border-danger" : "border-muted focus:border-accent"}`}
               />
               {errores.titulo && <p className="text-danger text-xs mt-1">{errores.titulo}</p>}
             </div>
@@ -228,8 +228,8 @@ export const TurnoFormModal = ({ isOpen, onClose, turno, onSubmit }: TurnoFormMo
                 value={descripcion}
                 onChange={(e) => { setDescripcion(e.target.value); setErrores((prev) => ({ ...prev, descripcion: "" })) }}
                 placeholder="Detalla el trabajo a realizar"
-                rows={3}
-                className={`w-full px-3 py-2 rounded-lg bg-background border-2 text-text text-sm placeholder-text-muted/60 outline-none transition-colors duration-200 resize-none ${errores.descripcion ? "border-danger" : "border-muted focus:border-accent"}`}
+                rows={2}
+                className={`w-full px-3 py-1.5 rounded-lg bg-background border-2 text-text text-sm placeholder-text-muted/60 outline-none transition-colors duration-200 resize-none ${errores.descripcion ? "border-danger" : "border-muted focus:border-accent"}`}
               />
               {errores.descripcion && <p className="text-danger text-xs mt-1">{errores.descripcion}</p>}
             </div>
@@ -242,7 +242,7 @@ export const TurnoFormModal = ({ isOpen, onClose, turno, onSubmit }: TurnoFormMo
                 <select
                   value={estadoComercial}
                   onChange={(e) => setEstadoComercial(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-background border-2 border-muted text-text text-sm outline-none focus:border-accent transition-colors duration-200 appearance-none cursor-pointer"
+                  className="w-full px-3 py-1.5 rounded-lg bg-background border-2 border-muted text-text text-sm outline-none focus:border-accent transition-colors duration-200 appearance-none cursor-pointer"
                 >
                   {ESTADOS_COMERCIALES.map((estado) => (
                     <option key={estado} value={estado}>{estado}</option>
@@ -258,7 +258,7 @@ export const TurnoFormModal = ({ isOpen, onClose, turno, onSubmit }: TurnoFormMo
                   value={estadoTecnico}
                   onChange={(e) => setEstadoTecnico(e.target.value)}
                   disabled={!isEditing}
-                  className="w-full px-3 py-2 rounded-lg bg-background border-2 border-muted text-text text-sm outline-none focus:border-accent transition-colors duration-200 appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-1.5 rounded-lg bg-background border-2 border-muted text-text text-sm outline-none focus:border-accent transition-colors duration-200 appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {ESTADOS_TECNICOS.map((estado) => (
                     <option key={estado} value={estado}>{estado}</option>
@@ -272,7 +272,7 @@ export const TurnoFormModal = ({ isOpen, onClose, turno, onSubmit }: TurnoFormMo
                 Servicios <span className="text-danger">*</span>
               </label>
               <div className="flex items-center gap-2">
-                <div className={`flex-1 rounded-lg px-3 py-2 bg-background border-2 ${errores.servicios ? "border-danger" : "border-muted"}`}>
+                <div className={`flex-1 rounded-lg px-3 py-1.5 bg-background border-2 ${errores.servicios ? "border-danger" : "border-muted"}`}>
                   {servicios.length === 0 ? (
                     <p className="text-text-muted text-sm">Sin servicios seleccionados</p>
                   ) : (
@@ -301,12 +301,12 @@ export const TurnoFormModal = ({ isOpen, onClose, turno, onSubmit }: TurnoFormMo
                 value={extras}
                 onChange={(e) => setExtras(e.target.value)}
                 placeholder="Información adicional (opcional)"
-                rows={2}
-                className="w-full px-3 py-2 rounded-lg bg-background border-2 border-muted text-text text-sm placeholder-text-muted/60 outline-none focus:border-accent transition-colors duration-200 resize-none"
+                rows={1}
+                className="w-full px-3 py-1.5 rounded-lg bg-background border-2 border-muted text-text text-sm placeholder-text-muted/60 outline-none focus:border-accent transition-colors duration-200 resize-none"
               />
             </div>
 
-            <div className="flex items-center justify-between pt-3 border-t border-muted">
+            <div className="flex items-center justify-between pt-2 border-t border-muted">
               <p className="text-text font-bold text-sm">
                 TOTAL: ${total.toLocaleString()}
               </p>
